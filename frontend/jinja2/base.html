@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="pXFaArvapTefxLAQWPNSophS52x7gvMtgqbbo1nrzyU" />
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="144x144" href="{{ static('images/airplane.png') }}">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-title" content="AFK Hangzhou">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" href="{{ static('images/airplane.png') }}">
+    <link rel="apple-touch-icon" href="{{ static('images/airplane.png') }}">
+
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="{{ static('images/airplane.png') }}">
+    <meta name="msapplication-TileColor" content="#3372DF">
+
+    <link rel="shortcut icon" type="image/png" href="{{ static('favicon.ico') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ static('css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('css/main.css') }}">
+
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="{{ GOOGLE_OAUTH2_CLIENT_ID }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('css/bootstrap-datepicker.min.css') }}">
+    {% block chart_css %}
+    {% endblock %}
+    <title>{% block title %}AFK Hangzhou{% endblock %}</title>
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" data-toggle="collapse" data-target="#navbar-collapsed" aria-expanded="false" class="navbar-toggle collapsed">
+                    <span class="sr-only">toggle</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="navbar-brand">Hangzhou Ingress</a>
+            </div>
+            <div id="navbar-collapsed" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li id="nav-explore" class="{% if request.resolver_match.view_name == 'frontend:top30' %}active{% endif %}">
+                        <a href="{{ url('frontend:top30')}}">TOP 30</a>
+                    </li>
+                    <li class="{% if request.resolver_match.view_name == 'frontend:team_compare' %}active{% endif %}">
+                        <a href="{{ url('frontend:team_compare')}}">总分</a>
+                    </li>
+                    <li class="{% if request.resolver_match.view_name == 'frontend:newbie' %}active{% endif %}">
+                        <a href="{{ url('frontend:newbie')}}">新手</a>
+                    </li>
+                    <li class="{% if request.resolver_match.view_name == 'frontend:player' %}active{% endif %}">
+                        <a href="{{ url('frontend:player')}}">玩家</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="highlight">
+                        {% if request.user.is_authenticated() %}
+                         <a href="{{ url('backend:user:logout')}}">{{ request.user.nickname }} Logout</a>
+                        {% else %}
+                         <a href="{{ url('backend:user:login')}}">Login</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block search_form %}
+    {% endblock %}
+        {% block content %}
+    <div id="main-container">
+    </div>
+        {% endblock %}
+    <script src="{{ static('admin/js/vendor/jquery/jquery.js') }}"></script>
+    <script src="{{ static('js/bootstrap.min.js') }}"></script>
+    <script src="{{ static('js/echarts.min.js') }}"></script>
+    <script src="{{ static('js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ static('js/bootstrap-datepicker.zh-CN.min.js') }}"></script>
+    {% block chart_script %}
+    {% endblock %}
+    <script>
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('/sw.js')
+                .then(function() { console.log('Service Worker Registered'); });
+        }
+    </script>
+</body>
+</html>

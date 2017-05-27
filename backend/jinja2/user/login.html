@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="container">
+<form class="hidden" method="post">
+  {{ csrf_input }}
+  <input type="text" name="token" value="" />
+</form>
+<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+</div>
+{% endblock %}
+{% block chart_script %}
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script>
+  function onSignIn(googleUser) {
+    // Useful data for your client-side scripts:
+    var profile = googleUser.getBasicProfile();
+    // The ID token you need to pass to your backend:
+    var id_token = googleUser.getAuthResponse().id_token;
+    $("input[name='token']").val(id_token);
+    $("form").submit();
+  };
+</script>
+{% endblock %}

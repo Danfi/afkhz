@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block chart_css %}
+    <style>
+        #main_form{
+            margin-top: 50px;
+            padding: 5px;
+        }
+        #main-container{
+            margin-top: 50px;
+        }
+        @media (max-width: 768px){
+            #main-container{
+                top: 170px;
+                margin-top: 0;
+            }
+            #main_form .input-group{
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+{% endblock %}
+    {% block search_form %}
+        <div id="main_form" class="form-inline">
+            <div class="input-group">
+                <span class="input-group-addon">开始:</span>
+                <input type="text" class="form-control" name="begin_date" id="id_begin_date">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">结束:</span>
+                <input type="text" class="form-control" name="end_date" id="id_end_date">
+            </div>
+            <input type="button" class="btn btn-primary" id="search_btn" value="Search">
+        </div>
+    {% endblock %}
+{% block chart_script %}
+    <script type="text/javascript">
+            $(document).on('ready', function(){
+            $('#id_begin_date, #id_end_date').datepicker({
+                format: "yyyy-mm-dd",
+                language: "zh-CN",
+                orientation: "bottom auto",
+                autoclose: true,
+                startDate: "2017-02-19"
+            });
+            var myChart = echarts.init(document.getElementById('main-container'));
+            var base_url = "{{ url('frontend:get_newbie')}}";
+            var default_date = new Date();
+            var default_month = default_date.getMonth();
+            if(default_date.getDay() == 1){
+                default_month = default_month - 1
+            }
+            var start_date = new Date(default_date.getFullYear(), default_month, 1);
+            default_date.setDate(default_date.getDate() - 1);
+            $('#id_begin_date').val(get_date_str(start_date));
+            $('#id_end_date').val(get_date_str(default_date));
+            get_data_func(myChart, base_url, get_url());
+            $('#search_btn').on('click', function(){
+                get_data_func(myChart, base_url, get_url());
+            });
+        });
+        function get_date_str(default_date){
+            var default_day = default_date.getDate();
+            var default_month = default_date.getMonth()+1;
+            var default_year = default_date.getFullYear();
+            if(default_day < 10){
+                default_day='0' + default_day
+            }
+            if(default_month < 10){
+                default_month = '0' + default_month
+            }
+            return default_year + '-' + default_month + '-' + default_day;
+        }
+        function get_url(){
+            url_data = {};
+            var begin_date = $('#id_begin_date').val();
+            var end_date = $('#id_end_date').val();
+            if(begin_date){
+                url_data['begin_date'] = begin_date.trim();
+            }
+            if(end_date){
+                url_data['end_date'] = end_date.trim();
+            }
+            return url_data;
+        }
+
+        function get_data_func(myChart, url, url_data){
+            myChart.showLoading();
+
+            $.ajax({
+                url: url,
+                type: "get",
+                data: url_data,
+                success: function(data) {
+                    myChart.hideLoading();
+
+                    option = {
+                        tooltip : {
+                            trigger: 'item'
+                        },
+                        legend: {
+                            data: ['ALL', 'RESISTANCE', 'ENLIGHTENED'],
+                            itemGap: 5
+                        },
+                        grid: {
+                            top: '12%',
+                            left: '1%',
+                            right: '10%',
+                            containLabel: true
+                        },
+                        xAxis: [
+                            {
+                                type : 'category',
+                                data : data.dates
+                            }
+                        ],
+                        yAxis: [
+                            {
+                                type : 'value',
+                                name : 'Points'
+                            }
+                        ],
+                        dataZoom: [
+                            {
+                                type: 'slider',
+                                show: true,
+                                start: 40,
+                                end: 100,
+                                handleSize: 8
+                            },
+                            {
+                                type: 'inside',
+                                start: 40,
+                                end: 100
+                            },
+                            {
+                                type: 'slider',
+                                show: true,
+                                yAxisIndex: 0,
+                                filterMode: 'empty',
+                                width: 12,
+                                height: '70%',
+                                handleSize: 8,
+                                showDataShadow: false,
+                                left: '93%'
+                            }
+                        ],
+                        series : [
+                            {
+                                name: 'ALL',
+                                type: 'line',
+                                data: data.ALL,
+                                label: {
+                                    normal: {
+                                        show: true,
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {color: 'red'}
+                                }
+                            },
+                            {
+                                name: 'RESISTANCE',
+                                type: 'line',
+                                data: data.RESISTANCE,
+                                label: {
+                                    normal: {
+                                        show: true,
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {color: '#1681A3'}
+                                }
+                            },
+                            {
+                                name: 'ENLIGHTENED',
+                                type: 'line',
+                                data: data.ENLIGHTENED,
+                                label: {
+                                    normal: {
+                                        show: true,
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {color: '#008000'}
+                                }
+                            }
+                        ]
+                    };
+
+                    myChart.setOption(option);
+                }
+
+            });
+        }
+    </script>
+{% endblock %}

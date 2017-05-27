@@ -1,0 +1,7 @@
+django==1.10.6
+psycopg2
+jinja2
+uwsgi
+oauth2client
+selenium
+requests

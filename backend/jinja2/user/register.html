@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="container">
+<form class="form-inline" method="post">
+  {{ csrf_input }}
+  <input type="text" class="hidden" name="token" value="" />
+  <div class="row form_row">
+    <div class="col-xs-3 col-sm-2 form_label">
+        <label for="codename">Codename</label>
+    </div>
+    <div class="col-xs-9 col-sm-10">
+    <input type="text" class="form-control" name="codename" required>
+    </div>
+  </div>
+  <div class="row form_row">
+  <div id="googleButton" class="form-group hidden col-xs-12">
+      <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+  </div>
+  </div>
+</form>
+  </div>
+{% endblock %}
+{% block chart_script %}
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script>
+  $("input[name='codename']").on("change paste keyup", function() {
+    if ($(this).val().length > 0) {
+      $("#googleButton").removeClass("hidden");
+    } else {
+      $("#googleButton").addClass("hidden");
+    }
+  });
+  function onSignIn(googleUser) {
+    // Useful data for your client-side scripts:
+    var profile = googleUser.getBasicProfile();
+    // The ID token you need to pass to your backend:
+    var id_token = googleUser.getAuthResponse().id_token;
+    console.log(id_token);
+    $("input[name='token']").val(id_token);
+      if($("input[name='codename']").val()){
+          $("form").submit();
+      }
+  };
+</script>
+{% endblock %}
